@@ -37,7 +37,7 @@ impl Assignment {
     }
 }
 
-#[aoc(day04, part1, imperative)]
+#[aoc(day04, part1)]
 pub fn part1(input: &str) -> i32 {
     input
         .lines()

@@ -104,7 +104,7 @@ fn parse_rounds(input: &str) -> Vec<Round> {
     input.lines().map(|x| Round::parse(x.trim())).collect()
 }
 
-#[aoc(day02, part1, imperative)]
+#[aoc(day02, part1)]
 pub fn part1(input: &str) -> i32 {
     parse_rounds(input).iter().map(Round::part1_score).sum()
 }

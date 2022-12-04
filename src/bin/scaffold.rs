@@ -10,7 +10,7 @@ use std::{
 
 const MODULE_TEMPLATE: &str = r###"use aoc_runner_derive::aoc;
 
-#[aoc(day{DAY}, part1, imperative)]
+#[aoc(day{DAY}, part1)]
 pub fn part1(input: &str) -> i32 {
     42
 }

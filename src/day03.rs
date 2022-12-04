@@ -36,7 +36,7 @@ fn letter_priority(c: char) -> u32 {
     }
 }
 
-#[aoc(day03, part1, imperative)]
+#[aoc(day03, part1)]
 pub fn part1(input: &str) -> u32 {
     input
         .lines()
