@@ -8,7 +8,7 @@ struct Assignment {
 }
 
 fn parse_range(range: &str) -> RangeInclusive<u32> {
-    match range.split("-").collect::<Vec<_>>().as_slice() {
+    match range.split('-').collect::<Vec<_>>().as_slice() {
         &[start, end] => RangeInclusive::new(start.parse().unwrap(), end.parse().unwrap()),
         _ => panic!("Invalid range: {range}"),
     }
@@ -16,7 +16,7 @@ fn parse_range(range: &str) -> RangeInclusive<u32> {
 
 impl Assignment {
     fn parse(input: &str) -> Assignment {
-        match input.split(",").collect::<Vec<_>>().as_slice() {
+        match input.split(',').collect::<Vec<_>>().as_slice() {
             &[first, second] => Assignment {
                 first: parse_range(first),
                 second: parse_range(second),

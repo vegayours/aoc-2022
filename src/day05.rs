@@ -5,13 +5,12 @@ type Stacks = Vec<Vec<u8>>;
 fn parse_stacks(lines: &[&str]) -> Stacks {
     let mut lines = lines.iter().rev();
     let first = lines.next().unwrap();
-    let n = first.len() / 4 + 1;
     let mut stacks: Stacks = vec![Vec::new(); first.len() / 4 + 1];
     for line in lines {
-        for i in 0..n {
+        for (i, stack) in stacks.iter_mut().enumerate() {
             let pos = 1 + i * 4;
             if pos < line.len() && line.as_bytes()[pos] != b' ' {
-                stacks[i].push(line.as_bytes()[pos]);
+                stack.push(line.as_bytes()[pos]);
             }
         }
     }
@@ -42,7 +41,7 @@ fn parse_input(input: &str) -> (Stacks, Vec<Move>) {
     let moves = input
         .lines()
         .skip(stack_lines.len() + 1)
-        .map(|l| Move::parse(l))
+        .map(Move::parse)
         .collect();
     (stacks, moves)
 }

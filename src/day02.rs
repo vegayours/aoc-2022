@@ -18,7 +18,7 @@ impl Choice {
             _ => panic!("Unsupported choice string: {s}"),
         }
     }
-    fn to_outcome(&self) -> Outcome {
+    fn as_outcome(&self) -> Outcome {
         match self {
             Choice::Rock => Outcome::Lose,
             Choice::Paper => Outcome::Draw,
@@ -74,7 +74,7 @@ impl Outcome {
 
 impl Round {
     fn parse(row: &str) -> Round {
-        match row.split(" ").collect::<Vec<&str>>()[..] {
+        match row.split(' ').collect::<Vec<&str>>()[..] {
             [opponent, player] => Round {
                 opponent: Choice::parse(opponent),
                 player: Choice::parse(player),
@@ -95,7 +95,7 @@ impl Round {
         self.player.score() + self.outcome().score()
     }
     fn part2_score(&self) -> i32 {
-        let outcome = self.player.to_outcome();
+        let outcome = self.player.as_outcome();
         outcome.score() + self.opponent.matchin_choice(&outcome).score()
     }
 }
