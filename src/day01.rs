@@ -1,5 +1,5 @@
 use aoc_runner_derive::aoc;
-use std::{cmp::Reverse, iter, collections::BinaryHeap};
+use std::{cmp::Reverse, collections::BinaryHeap, iter};
 
 fn parse_calories(input: &str) -> Vec<i32> {
     let mut calories = Vec::new();
