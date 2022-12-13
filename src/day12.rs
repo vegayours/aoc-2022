@@ -37,7 +37,7 @@ fn neighbors((i, j): (usize, usize), m: usize, n: usize) -> Vec<(usize, usize)> 
     res
 }
 
-fn solve(grid: &[&[u8]]) -> Vec<Vec<usize>> {
+fn solve(grid: &[&[u8]], stop_cell: u8) -> Option<usize> {
     let m = grid.len();
     let n = grid[0].len();
     let end = find_cell(grid, b'E');
@@ -47,12 +47,12 @@ fn solve(grid: &[&[u8]]) -> Vec<Vec<usize>> {
     min_heap.push_back(end);
 
     while let Some((i, j)) = min_heap.pop_front() {
-        if grid[i][j] == b'S' || grid[i][j] == b'a' {
-            continue;
-        }
         for (x, y) in neighbors((i, j), m, n) {
             if height(grid[i][j]) > height(grid[x][y]) + 1 {
                 continue;
+            }
+            if grid[x][y] == stop_cell {
+                return Some(visited[i][j] + 1);
             }
             if visited[x][y] == usize::MAX {
                 visited[x][y] = visited[i][j] + 1;
@@ -61,28 +61,19 @@ fn solve(grid: &[&[u8]]) -> Vec<Vec<usize>> {
         }
     }
 
-    visited
+    None
 }
 
 #[aoc(day12, part1)]
 pub fn part1(input: &str) -> usize {
     let grid: Vec<&[u8]> = input.lines().map(|l| l.trim().as_bytes()).collect();
-    let start = find_cell(&grid, b'S');
-    let visited = solve(&grid);
-    visited[start.0][start.1]
+    solve(&grid, b'S').unwrap()
 }
 
 #[aoc(day12, part2)]
 pub fn part2(input: &str) -> usize {
     let grid: Vec<&[u8]> = input.lines().map(|l| l.trim().as_bytes()).collect();
-    let visited = solve(&grid);
-    grid.iter()
-        .zip(visited.iter())
-        .flat_map(|(grid_row, visited_row)| grid_row.iter().zip(visited_row.iter()))
-        .filter(|(g, _)| **g == b'S' || **g == b'a')
-        .map(|(_, v)| *v)
-        .max()
-        .unwrap()
+    solve(&grid, b'a').unwrap()
 }
 
 #[cfg(test)]
