@@ -17,9 +17,13 @@ struct Node {
 
 #[derive(Debug)]
 struct Input {
+    // All nodes as parsed from input.
     nodes: Vec<Node>,
+    // Distance from each node to every other node.
     dist: Vec<Vec<usize>>,
+    // Index of the start node.
     start: usize,
+    // Pairs (index, pressure) for valves that have pressure >.
     candidates: Vec<(usize, usize)>,
 }
 
@@ -40,18 +44,22 @@ fn parse_node(input: &str) -> Node {
 
 fn parse_input(input: &str) -> Input {
     let nodes: Vec<Node> = input.lines().map(parse_node).collect();
+    // Map each node name to index, where index is the index of the input line.
     let map: HashMap<&str, usize> = nodes
         .iter()
         .enumerate()
         .map(|(i, s)| (s.name.as_str(), i))
         .collect();
     let n = nodes.len();
+    // Start node is "AA".
     let start = nodes
         .iter()
         .enumerate()
         .find(|(_i, n)| n.name == "AA")
         .unwrap()
         .0;
+    // We can consider jumping only between valves with pressure to speed up backtracking.
+    // Lets calculuate distance between each nodes with Floyd–Warshall algo.
     let mut dist = vec![vec![usize::MAX / 2; n]; n];
     for (u, node) in nodes.iter().enumerate() {
         dist[u][u] = 0;
@@ -69,7 +77,7 @@ fn parse_input(input: &str) -> Input {
             }
         }
     }
-
+    // Take only nodes with pressure > 0 as candidates for backtracking.
     let candidates: Vec<(usize, usize)> = nodes
         .iter()
         .enumerate()
@@ -84,6 +92,10 @@ fn parse_input(input: &str) -> Input {
     }
 }
 
+// Simple backtracking over all candidates order until we are out of budget.
+// Can be potentially improved by some pruning, but takes only ~11 ms for Part 1, so not worth it.
+// 'Greedy' (e.g. taking the best option on every step) doesn't work.
+// Likely there is some DP approach, but it is not apparent for me.
 fn backtrack1(
     (u, budget): (usize, usize),
     pressure: usize,
@@ -116,6 +128,11 @@ fn backtrack1(
     max_pressure
 }
 
+// Stupid backtracking with 2 pointers.
+// For each unvisited point we choose the one, that leaves the biggest budget.
+// This seems to work for test and my input, but I'm not convinced this is algorithmically correct.
+// This is very slow - ~40s on my laptop. Likely can be optimized with some pruning,
+// but ideally I should look for some algo approach.
 fn backtrack2(
     (u_1, budget_1): (usize, usize),
     (u_2, budget_2): (usize, usize),
