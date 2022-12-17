@@ -193,6 +193,42 @@ pub fn part1(input: &str) -> usize {
     backtrack1((input.start, 30), 0, &input.dist, &candidates, &mut visited)
 }
 
+// Bottom-up DP for part 1. Apparently much slower than backtracking.
+#[aoc(day16, part1, dp)]
+pub fn part1_dp(input: &str) -> usize {
+    let input = parse_input(input);
+    let n = input.candidates.len();
+    let lim: usize = 1 << n;
+    let budget = 30;
+    let mut dp = vec![vec![vec![0_usize; n + 1]; lim]; budget + 1];
+
+    let is_bit_set = |m, u| (m & (1_usize << u)) != 0;
+    let set_bit = |m, u| m | (1_usize << u);
+
+    for b in 2..=budget {
+        for m in 0..lim {
+            for (i, &(u, _)) in input
+                .candidates
+                .iter()
+                .enumerate()
+                // Add start ('AA') as one of the candidates.
+                .chain(std::iter::once((n, &(input.start, 0_usize))))
+            {
+                let mut r = 0;
+                for (j, &(v, p)) in input.candidates.iter().enumerate() {
+                    let d = input.dist[u][v];
+                    if !is_bit_set(m, j) && b > d {
+                        r = r.max(dp[b - d - 1][set_bit(m, j)][j] + p * (b - d - 1));
+                    }
+                }
+                dp[b][m][i] = r;
+            }
+        }
+    }
+
+    dp[budget][0][n]
+}
+
 #[aoc(day16, part2)]
 pub fn part2(input: &str) -> usize {
     let input = parse_input(input);
@@ -209,6 +245,51 @@ pub fn part2(input: &str) -> usize {
     )
 }
 
+// Can't figure out the right bottom-up DP for the part2. Also very slow (2x faster than backtracking)
+// WIP for now.
+//#[aoc(day16, part2, dp)]
+#[allow(unused)]
+pub fn part2_dp(input: &str) -> usize {
+    let input = parse_input(input);
+    let n = input.candidates.len();
+    let lim: usize = 1 << n;
+    let budget = 26;
+    let mut dp = vec![vec![vec![vec![0_usize; n + 1]; lim]; budget + 1]; budget + 1];
+
+    let is_bit_set = |m, u| (m & (1_usize << u)) != 0;
+    let set_bit = |m, u| m | (1_usize << u);
+
+    for b1 in 2..=budget {
+        for b2 in 2..=b1 {
+            for m in 0..lim {
+                for (i, &(u, _)) in input
+                    .candidates
+                    .iter()
+                    .enumerate()
+                    // Add start ('AA') as one of the candidates.
+                    .chain(std::iter::once((n, &(input.start, 0_usize))))
+                {
+                    let mut r = 0;
+                    for (j, &(v, p)) in input.candidates.iter().enumerate() {
+                        let d = input.dist[u][v];
+                        if !is_bit_set(m, j) {
+                            if b1 > d {
+                                r = r.max(dp[b1 - d - 1][b2][set_bit(m, j)][j] + p * (b1 - d - 1));
+                            }
+                            if b2 > d {
+                                r = r.max(dp[b1][b2 - d - 1][set_bit(m, j)][j] + p * (b2 - d - 1));
+                            }
+                        }
+                    }
+                    dp[b1][b2][m][i] = r;
+                }
+            }
+        }
+    }
+
+    dp[budget][budget][0][n]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -220,8 +301,22 @@ mod tests {
     }
 
     #[test]
+    fn test_example_part1_dp() {
+        let example = include_str!("examples/day16.txt");
+        assert_eq!(part1_dp(example), 1651);
+    }
+
+    #[test]
     fn test_example_part2() {
         let example = include_str!("examples/day16.txt");
         assert_eq!(part2(example), 1707);
     }
+
+    /*
+    #[test]
+    fn test_example_part2_dp() {
+        let example = include_str!("examples/day16.txt");
+        assert_eq!(part2_dp(example), 1707);
+    }
+    */
 }
