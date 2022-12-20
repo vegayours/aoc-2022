@@ -14,6 +14,12 @@ struct Blueprint {
     geode: (u16, u16),
 }
 
+impl Blueprint {
+    fn max_ore_robots(&self) -> u16 {
+        self.clay.max(self.obsidian.0).max(self.geode.0)
+    }
+}
+
 fn parse_blueprint(line: &str) -> Blueprint {
     let captures: Vec<u16> = RE
         .captures(line)
@@ -52,7 +58,7 @@ impl State {
     }
 
     fn add_ore_robot(&self, blueprint: &Blueprint) -> Option<Self> {
-        if self.ore >= blueprint.ore {
+        if self.ore >= blueprint.ore && self.ore_robots < blueprint.max_ore_robots()  {
             let adjusted = self.tick();
             Some(Self {
                 ore_robots: adjusted.ore_robots + 1,
@@ -65,7 +71,7 @@ impl State {
     }
 
     fn add_clay_robot(&self, blueprint: &Blueprint) -> Option<Self> {
-        if self.ore >= blueprint.clay {
+        if self.ore >= blueprint.clay && self.clay_robots < blueprint.obsidian.1 {
             let adjusted = self.tick();
             Some(Self {
                 clay_robots: adjusted.clay_robots + 1,
@@ -79,7 +85,7 @@ impl State {
 
     fn add_obsidian_robot(&self, blueprint: &Blueprint) -> Option<Self> {
         let (ore, clay) = blueprint.obsidian;
-        if self.ore >= ore && self.clay >= clay {
+        if self.ore >= ore && self.clay >= clay && self.obsidian_robots < blueprint.geode.1 {
             let adjusted = self.tick();
             Some(Self {
                 obsidian_robots: adjusted.obsidian_robots + 1,
