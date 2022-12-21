@@ -58,7 +58,7 @@ impl State {
     }
 
     fn add_ore_robot(&self, blueprint: &Blueprint) -> Option<Self> {
-        if self.ore >= blueprint.ore && self.ore_robots < blueprint.max_ore_robots()  {
+        if self.ore >= blueprint.ore && self.ore_robots < blueprint.max_ore_robots() {
             let adjusted = self.tick();
             Some(Self {
                 ore_robots: adjusted.ore_robots + 1,
